@@ -1,0 +1,8 @@
+{
+  "name": "static files webserver",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "ejs": "^2.6.1"
+  }
+}
