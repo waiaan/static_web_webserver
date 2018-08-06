@@ -5,7 +5,7 @@ const ejs = require("ejs");
 const config = {
 	port:1111
 }
-let root = null;
+let root = "";
 
 const getFileExt = (fileName) => {
 	let arr = fileName.split(".");
@@ -17,7 +17,16 @@ const isFile = (path) => {
 }
 
 if (process.argv[2]) {
-	root = process.argv[2];
+	// 处理路径含有空格的情况
+	let n = 2;
+	while (process.argv[n]) {
+		root += process.argv[n];
+		n++;
+		if (process.argv[n]) {
+			root += " ";
+		}
+	}
+	root.replace(/\s*$/img, "");
 } else {
 	root = __dirname;
 }
@@ -27,6 +36,24 @@ const router = (req, res) => {
 		return;
 	}
 	if (req.url === "/") {
+		// 存在index.htm或者index.html时默认展示
+		let arr = fs.readdirSync(root);
+		if (arr.indexOf("index.htm")>0) {
+			let reqPath = path.join(root, "index.htm");
+			if (reqPath.indexOf('?') > 0) {
+				reqPath = reqPath.split('?')[0];
+			}
+			reqPath = decodeURI(reqPath);
+			return handleFile(reqPath, req, res);
+		} else if (arr.indexOf("index.html") > 0) {
+			let reqPath = path.join(root, "index.html");
+			if (reqPath.indexOf('?') > 0) {
+				reqPath = reqPath.split('?')[0];
+			}
+			reqPath = decodeURI(reqPath);
+			return handleFile(reqPath, req, res);
+		}
+		
 		return handleDir(root,req, res);
 	}
 	if (req.url !== "/") {
